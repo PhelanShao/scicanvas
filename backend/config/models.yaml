@@ -1,0 +1,148 @@
+# Deep Thinking Backend - Model Configuration
+# Supports multiple LLM providers with tiered model selection
+
+# Thinking depth strategies
+thinking_strategies:
+  off:
+    description: "Direct response without extended reasoning"
+    model_tier: small
+    max_tokens: 2000
+    temperature: 0.7
+    
+  quick:
+    description: "Brief thinking process for simple queries"
+    model_tier: small
+    max_tokens: 4000
+    temperature: 0.5
+    system_prompt_prefix: "Think briefly before answering."
+    
+  standard:
+    description: "Standard thinking with step-by-step reasoning"
+    model_tier: medium
+    max_tokens: 8000
+    temperature: 0.3
+    system_prompt_prefix: "Think step by step and explain your reasoning clearly."
+    
+  deep:
+    description: "Deep analysis with comprehensive reasoning"
+    model_tier: large
+    max_tokens: 16000
+    temperature: 0.2
+    system_prompt_prefix: |
+      Engage in deep, thorough analysis. Consider multiple perspectives,
+      potential counterarguments, edge cases, and implications.
+      Structure your thinking clearly with explicit reasoning steps.
+
+# Model tiers - ordered by priority (lower = higher priority)
+model_tiers:
+  small:
+    providers:
+      - provider: openai
+        model: gpt-4o-mini
+        priority: 1
+      - provider: anthropic
+        model: claude-3-5-haiku-20241022
+        priority: 2
+      - provider: deepseek
+        model: deepseek-chat
+        priority: 3
+
+  medium:
+    providers:
+      - provider: openai
+        model: gpt-4o
+        priority: 1
+      - provider: anthropic
+        model: claude-3-5-sonnet-20241022
+        priority: 2
+      - provider: deepseek
+        model: deepseek-chat
+        priority: 3
+
+  large:
+    providers:
+      - provider: openai
+        model: o1
+        priority: 1
+      - provider: anthropic
+        model: claude-3-5-sonnet-20241022
+        priority: 2
+      - provider: deepseek
+        model: deepseek-reasoner
+        priority: 3
+
+# Provider settings
+provider_settings:
+  openai:
+    base_url: https://api.openai.com/v1
+    timeout: 300
+    max_retries: 3
+    
+  anthropic:
+    base_url: https://api.anthropic.com
+    timeout: 300
+    max_retries: 3
+    
+  deepseek:
+    base_url: https://api.deepseek.com/v1
+    timeout: 120
+    max_retries: 3
+
+# Model catalog with capabilities
+model_catalog:
+  openai:
+    gpt-4o-mini:
+      tier: small
+      context_window: 128000
+      max_tokens: 16384
+      supports_streaming: true
+      supports_vision: false
+    gpt-4o:
+      tier: medium
+      context_window: 128000
+      max_tokens: 16384
+      supports_streaming: true
+      supports_vision: true
+    o1:
+      tier: large
+      context_window: 200000
+      max_tokens: 100000
+      supports_streaming: true
+      supports_reasoning: true
+
+  anthropic:
+    claude-3-5-haiku-20241022:
+      tier: small
+      context_window: 200000
+      max_tokens: 8192
+      supports_streaming: true
+    claude-3-5-sonnet-20241022:
+      tier: medium
+      context_window: 200000
+      max_tokens: 8192
+      supports_streaming: true
+      supports_vision: true
+
+  deepseek:
+    deepseek-chat:
+      tier: small
+      context_window: 64000
+      max_tokens: 8192
+      supports_streaming: true
+    deepseek-reasoner:
+      tier: large
+      context_window: 64000
+      max_tokens: 8192
+      supports_streaming: true
+      supports_reasoning: true
+
+# Rate limiting
+rate_limits:
+  default_rpm: 60
+  default_tpm: 100000
+
+# Caching (optional)
+cache:
+  enabled: true
+  ttl_seconds: 3600
+  max_size: 1000
